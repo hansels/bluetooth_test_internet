@@ -38,7 +38,14 @@ class _DiscoveryPage extends State<DiscoveryPage> {
 
     _startDiscovery();
   }
-
+  void discover() {
+    _streamSubscription = FlutterBluetoothSerial.instance
+        .startDiscovery()
+        .listen((r) => setState(() {
+      print("ARISING");
+      results.add(r);
+    }));
+  }
   void _startDiscovery() {
     _streamSubscription =
         FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
@@ -67,39 +74,62 @@ class _DiscoveryPage extends State<DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: isDiscovering
-            ? Text('Discovering devices')
-            : Text('Discovered devices'),
-        actions: <Widget>[
-          isDiscovering
-              ? FittedBox(
-            child: Container(
-              margin: new EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        body: SafeArea(
+          child: Column(
+            children: [
+              ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: results.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                        title: Text(results[index].device.address +
+                            " " +
+                            results[index].device.name!));
+                  }),
+              Container(
+                child: ElevatedButton(
+                  child: Text("Click"),
+                  onPressed: () => _startDiscovery(),
+                ),
               ),
-            ),
-          )
-              : IconButton(
-            icon: Icon(Icons.replay),
-            onPressed: _restartDiscovery,
-          )
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: results.length,
-        itemBuilder: (BuildContext context, index) {
-          BluetoothDiscoveryResult result = results[index];
-          return BluetoothDeviceListEntry(
-            device: result.device,
-            rssi: result.rssi,
-            onTap: () {
-              Navigator.of(context).pop(result.device);
-            },
-          );
-        },
-      ),
-    );
+            ],
+          ),
+        ));
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     title: isDiscovering
+    //         ? Text('Discovering devices')
+    //         : Text('Discovered devices'),
+    //     actions: <Widget>[
+    //       isDiscovering
+    //           ? FittedBox(
+    //         child: Container(
+    //           margin: new EdgeInsets.all(16.0),
+    //           child: CircularProgressIndicator(
+    //             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+    //           ),
+    //         ),
+    //       )
+    //           : IconButton(
+    //         icon: Icon(Icons.replay),
+    //         onPressed: _restartDiscovery,
+    //       )
+    //     ],
+    //   ),
+    //   body: ListView.builder(
+    //     itemCount: results.length,
+    //     itemBuilder: (BuildContext context, index) {
+    //       BluetoothDiscoveryResult result = results[index];
+    //       return BluetoothDeviceListEntry(
+    //         device: result.device,
+    //         rssi: result.rssi,
+    //         onTap: () {
+    //           Navigator.of(context).pop(result.device);
+    //         },
+    //       );
+    //     },
+    //   ),
+    // );
   }
 }

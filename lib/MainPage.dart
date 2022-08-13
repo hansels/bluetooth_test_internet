@@ -30,7 +30,7 @@ class _MainPage extends State<MainPage> {
 
     Future.doWhile(() async {
       // Wait if adapter not enabled
-      if (await FlutterBluetoothSerial.instance.isEnabled) {
+      if (false) {
         return false;
       }
       await Future.delayed(Duration(milliseconds: 0xDD));
