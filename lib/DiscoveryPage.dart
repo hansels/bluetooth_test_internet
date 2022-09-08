@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_bluetoothtest/ChatPage.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 import './BluetoothDeviceListEntry.dart';
@@ -38,21 +39,23 @@ class _DiscoveryPage extends State<DiscoveryPage> {
 
     _startDiscovery();
   }
+
   void discover() {
     _streamSubscription = FlutterBluetoothSerial.instance
         .startDiscovery()
         .listen((r) => setState(() {
-      print("ARISING");
-      results.add(r);
-    }));
+              print("ARISING");
+              results.add(r);
+            }));
   }
+
   void _startDiscovery() {
     _streamSubscription =
         FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
-          setState(() {
-            results.add(r);
-          });
-        });
+      setState(() {
+        results.add(r);
+      });
+    });
 
     _streamSubscription.onDone(() {
       setState(() {
@@ -75,27 +78,35 @@ class _DiscoveryPage extends State<DiscoveryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-          child: Column(
-            children: [
-              ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: results.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                        title: Text(results[index].device.address +
-                            " " +
-                            results[index].device.name!));
-                  }),
-              Container(
-                child: ElevatedButton(
-                  child: Text("Click"),
-                  onPressed: () => _startDiscovery(),
-                ),
-              ),
-            ],
+      child: Column(
+        children: [
+          ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: results.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: GestureDetector(
+                      child: Text(results[index].device.address ?? "evan"),
+                      onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatPage(
+                                      server: results[index].device,
+                                    )),
+                          )),
+                  subtitle: Text(results[index].device.name ?? "Evan"),
+                );
+              }),
+          Container(
+            child: ElevatedButton(
+              child: Text("Click"),
+              onPressed: () => _startDiscovery(),
+            ),
           ),
-        ));
+        ],
+      ),
+    ));
     // return Scaffold(
     //   appBar: AppBar(
     //     title: isDiscovering
